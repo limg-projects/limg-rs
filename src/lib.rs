@@ -7,6 +7,7 @@ mod pixel;
 mod image;
 mod error;
 
+pub use limg_core::PixelEndian;
 pub use pixel::Pixel;
 pub use image::Image;
 pub use error::{Error, Result};

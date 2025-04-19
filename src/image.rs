@@ -39,6 +39,16 @@ impl Image {
     /// `width`と`height`を指定してLimg画像を作成します。
     /// 
     /// 透明色なしの黒で初期化されます。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let image = Image::new(100, 50);
+    /// 
+    /// assert_eq!(image.transparent_color(), None);
+    /// assert_eq!(image[(0, 0)], Pixel::BLACK);
+    /// ```
     #[inline]
     pub fn new(width: u16, height: u16) -> Image {
         Image {
@@ -52,6 +62,16 @@ impl Image {
     /// `width`と`height`、`transparent_color`を指定してLimg画像を作成します。
     /// 
     /// 黒で初期化されます。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let image = Image::with_transparent_color(100, 50, Pixel::WHITE);
+    /// 
+    /// assert_eq!(image.transparent_color(), Some(Pixel::WHITE));
+    /// assert_eq!(image[(0, 0)], Pixel::BLACK);
+    /// ```
     #[inline]
     pub fn with_transparent_color(width: u16, height: u16, transparent_color: Pixel) -> Image {
         Image {
@@ -63,12 +83,30 @@ impl Image {
     }
 
     /// 画像の幅を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::Image;
+    /// let image = Image::new(100, 50);
+    /// 
+    /// assert_eq!(image.width(), 100);
+    /// ```
     #[inline(always)]
     pub fn width(&self) -> u16 {
         self.width
     }
 
     /// 画像の高さを返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::Image;
+    /// let image = Image::new(100, 50);
+    /// 
+    /// assert_eq!(image.height(), 50);
+    /// ```
     #[inline(always)]
     pub fn height(&self) -> u16 {
         self.height
@@ -77,6 +115,15 @@ impl Image {
     /// 画像の透明色を返します。
     /// 
     /// 指定がない場合`None`になります。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let image = Image::with_transparent_color(100, 50, Pixel::WHITE);
+    /// 
+    /// assert_eq!(image.transparent_color(), Some(Pixel::WHITE));
+    /// ```
     #[inline(always)]
     pub fn transparent_color(&self) -> Option<Pixel> {
         self.transparent_color
@@ -85,24 +132,34 @@ impl Image {
     /// 画像の透明色を設定します。
     /// 
     /// 指定しない場合`None`を設定してください。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// image.set_transparent_color(Some(Pixel::WHITE));
+    /// 
+    /// assert_eq!(image.transparent_color(), Some(Pixel::WHITE));
+    /// ```
     #[inline(always)]
     pub fn set_transparent_color(&mut self, transparent_color: Option<Pixel>) {
         self.transparent_color = transparent_color;
     }
 
-    /// `(x, y)`の位置のピクセルを設定します。
-    /// 
-    /// # Panics
-    /// 
-    /// `(x, y)`が`(width, height)`の範囲内にない場合はパニックになります。
-    #[inline(always)]
-    pub fn set_pixel(&mut self, x: u16, y: u16, pixel: Pixel) {
-        self.pixels[image_index(x, y, self.width)] = pixel;
-    }
-
     /// `(x, y)`の位置のピクセルの参照を取得します。
     /// 
     /// `(x, y)`が`(width, height)`の範囲内にない場合は`None`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// image[(0, 0)] = Pixel::WHITE;
+    /// 
+    /// assert_eq!(image.get_pixel(0, 0), Some(Pixel::WHITE).as_ref());
+    /// ```
     #[inline(always)]
     pub fn get_pixel(&self, x: u16, y: u16) -> Option<&Pixel> {
         if x < self.width || y < self.height {
@@ -121,6 +178,16 @@ impl Image {
     /// # Safety
     /// 
     /// 範囲外のインデックスを使用してこの関数を呼び出すと、 結果の参照が使用されない場合でも未定義の動作になります。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// image[(0, 0)] = Pixel::WHITE;
+    /// 
+    /// assert_eq!(unsafe { *image.get_pixel_unchecked(0, 0) }, Pixel::WHITE);
+    /// ```
     #[inline(always)]
     pub unsafe fn get_pixel_unchecked(&self, x: u16, y: u16) -> &Pixel {
         unsafe { self.pixels.get_unchecked(image_index(x, y, self.width)) }
@@ -130,6 +197,16 @@ impl Image {
     /// `(x, y)`の位置のピクセルの可変参照を取得します。
     /// 
     /// `(x, y)`が`(width, height)`の範囲内にない場合は`None`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// *image.get_pixel_mut(0, 0).unwrap() = Pixel::WHITE;
+    /// 
+    /// assert_eq!(image[(0, 0)], Pixel::WHITE);
+    /// ```
     #[inline(always)]
     pub fn get_pixel_mut(&mut self, x:u16, y: u16) -> Option<&mut Pixel> {
         if x < self.width || y < self.height {
@@ -148,24 +225,65 @@ impl Image {
     /// # Safety
     /// 
     /// 範囲外のインデックスを使用してこの関数を呼び出すと、 結果の参照が使用されない場合でも未定義の動作になります。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// *(unsafe { image.get_pixel_unchecked_mut(0, 0) }) = Pixel::WHITE;
+    /// 
+    /// assert_eq!(image[(0, 0)], Pixel::WHITE);
+    /// ```
     #[inline(always)]
     pub unsafe fn get_pixel_unchecked_mut(&mut self, x: u16, y: u16) -> &mut Pixel {
         unsafe { self.pixels.get_unchecked_mut(image_index(x, y, self.width)) }
     }
 
     /// 画像のピクセルデータのスライスを取得します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// image[(0, 0)] = Pixel::WHITE;
+    /// 
+    /// assert_eq!(image.pixels()[0], Pixel::WHITE);
+    /// ```
     #[inline(always)]
     pub fn pixels(&self) -> &[Pixel] {
         &self.pixels
     }
 
     /// 画像のピクセルデータの可変スライスを取得します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// image.pixels_mut()[0] = Pixel::WHITE;
+    /// 
+    /// assert_eq!(image[(0, 0)], Pixel::WHITE);
+    /// ```
     #[inline(always)]
     pub fn pixels_mut(&mut self) -> &mut [Pixel] {
         &mut self.pixels
     }
 
     /// 指定した色で画像を塗りつぶします。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// image.fill(Pixel::WHITE);
+    /// 
+    /// assert_eq!(image[(0, 0)], Pixel::WHITE);
+    /// assert_eq!(image[(99, 49)], Pixel::WHITE);
+    /// ```
     #[inline(always)]
     pub fn fill(&mut self, pixel: Pixel) {
         self.pixels.fill(pixel);
@@ -176,6 +294,17 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正な場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, Result};
+    /// # fn main() -> Result<()> {
+    /// let buf = [0u8; 1024];
+    /// let image = Image::from_buffer(buf)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn from_buffer(buf: impl AsRef<[u8]>) -> Result<Image> {
         let buf = buf.as_ref();
 
@@ -203,6 +332,18 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正な場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, Result};
+    /// # fn main() -> Result<()> {
+    /// # let image = Image::new(10, 10);
+    /// let mut buf = [0u8; 1024];
+    /// image.to_buffer(&mut buf)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     #[inline(always)]
     pub fn to_buffer(&self, buf: &mut impl AsMut<[u8]>) -> Result<()> {
         self.to_buffer_with_endian(buf, PixelEndian::Little)
@@ -213,6 +354,18 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正な場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, PixelEndian, Result};
+    /// # fn main() -> Result<()> {
+    /// # let image = Image::new(10, 10);
+    /// let mut buf = [0u8; 1024];
+    /// image.to_buffer_with_endian(&mut buf, PixelEndian::Big)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn to_buffer_with_endian(&self, buf: &mut impl AsMut<[u8]>, endian: PixelEndian) -> Result<()> {
         let buf = buf.as_mut();
 
@@ -257,6 +410,15 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正かIO操作に失敗した場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, Result};
+    /// # fn main() -> Result<()> {
+    /// let image = Image::open("image.limg")?;
+    /// # Ok(())
+    /// # }
     #[inline(always)]
     pub fn open(path: impl AsRef<std::path::Path>) -> Result<Image> {
         Image::from_read(std::fs::File::open(path)?)
@@ -267,6 +429,16 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正かIO操作に失敗した場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, Result};
+    /// # fn main() -> Result<()> {
+    /// let mut reader = std::fs::File::open("image.limg")?;
+    /// let image = Image::from_read(reader)?;
+    /// # Ok(())
+    /// # }
     pub fn from_read(reader: impl std::io::Read) -> Result<Image> {
         let mut reader = reader;
         
@@ -302,6 +474,17 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正かIO操作に失敗した場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, Result};
+    /// # fn main() -> Result<()> {
+    /// # let image = Image::new(10, 10);
+    /// image.save("image.limg")?;
+    /// # Ok(())
+    /// # }
+    /// ```
     #[inline(always)]
     pub fn save(&self, path: impl AsRef<std::path::Path>) -> Result<()> {
         let mut file = std::fs::File::create(path)?;
@@ -313,6 +496,17 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正かIO操作に失敗した場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, PixelEndian, Result};
+    /// # fn main() -> Result<()> {
+    /// # let image = Image::new(10, 10);
+    /// image.save_with_endian("image.limg", PixelEndian::Big)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     #[inline(always)]
     pub fn save_with_endian(&self, path: impl AsRef<std::path::Path>, endian: PixelEndian) -> Result<()> {
         let mut file = std::fs::File::create(path)?;
@@ -326,6 +520,18 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正かIO操作に失敗した場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, Result};
+    /// # fn main() -> Result<()> {
+    /// # let image = Image::new(10, 10);
+    /// let mut writer = std::fs::File::create("image.limg")?;
+    /// image.to_write(&mut writer)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     #[inline(always)]
     pub fn to_write(&self, writer: &mut impl std::io::Write) -> Result<()> {
         self.to_write_with_endian(writer, PixelEndian::Little)
@@ -336,6 +542,18 @@ impl Image {
     /// # Errors
     /// 
     /// 画像データが不正かIO操作に失敗した場合、`Error`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust,no_run
+    /// # use limg::{Image, PixelEndian, Result};
+    /// # fn main() -> Result<()> {
+    /// # let image = Image::new(10, 10);
+    /// let mut writer = std::fs::File::create("image.limg")?;
+    /// image.to_write_with_endian(&mut writer, PixelEndian::Big)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn to_write_with_endian(&self, writer: &mut impl std::io::Write, endian: PixelEndian) -> Result<()> {
         let spec = ImageSpec {
             width: self.width,
