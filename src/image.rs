@@ -112,6 +112,23 @@ impl Image {
         self.height
     }
 
+    /// 画像の左上隅から始める`ImageIndex`を返します。
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # use limg::{Image, Pixel};
+    /// let mut image = Image::new(100, 50);
+    /// 
+    /// for index in image.coordinates() {
+    ///     image[index] = Pixel::WHITE;
+    /// }
+    /// ```
+    #[inline(always)]
+    pub fn coordinates(&self) -> ImageIndex {
+        ImageIndex::new(self.width, self.height)
+    }
+
     /// 画像の透明色を返します。
     /// 
     /// 指定がない場合`None`になります。
@@ -580,3 +597,75 @@ impl Image {
         Ok(())
     }
 }
+
+
+/// 画像の座標`(x, y)`を返す`Iterator`です。
+/// 
+/// 画像の左上隅から行優先で進めます。
+#[derive(Clone, Copy, Debug)]
+pub struct ImageIndex {
+    width: u16,
+    height: u16,
+    x: u16,
+    y: u16,
+}
+
+impl ImageIndex {
+    fn new(width: u16, height: u16) -> ImageIndex {
+        ImageIndex { width, height, x: 0, y: 0 }
+    }
+}
+
+impl core::iter::Iterator for ImageIndex {
+    type Item = (u16, u16);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.x < self.width && self.y < self.height {
+            let result = Some((self.x, self.y));
+            self.x += 1;
+            if self.x == self.width {
+                self.x = 0;
+                self.y += 1;
+            }
+            result
+        } else {
+            None
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        // 総ピクセル数 − 既に返したピクセル数
+        let total = (self.width as usize) * (self.height as usize);
+        let done  = (self.y as usize) * (self.width as usize) + (self.x as usize);
+        let rem   = total.saturating_sub(done);
+        (rem, Some(rem))
+    }
+
+    fn nth(&mut self, n: usize) -> Option<Self::Item> {
+        let total = (self.width as usize) * (self.height as usize);
+        let done  = (self.y as usize) * (self.width as usize) + (self.x as usize);
+    
+        // スキップ後の残り要素数をチェック
+        if n >= total.saturating_sub(done) {
+            self.x = self.width;
+            self.y = self.height;
+            return None;
+        }
+    
+        // 現在位置から n 要素先まで「線形」に進んだあとの絶対オフセット
+        let linear = done + n;
+        // 新しい x 列
+        self.x = (linear % self.width as usize) as u16;
+    
+        // その要素を返したうえで、自動的に x を 1 進め、必要なら y を折り返す
+        let ret = (self.x, self.y);
+        self.x += 1;
+        if self.x == self.width {
+            self.x = 0;
+            self.y += 1;
+        }
+        Some(ret)
+    }}
+
+impl core::iter::ExactSizeIterator for ImageIndex {}
+impl core::iter::FusedIterator for ImageIndex {}
