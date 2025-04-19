@@ -9,5 +9,5 @@ mod error;
 
 pub use limg_core::PixelEndian;
 pub use pixel::Pixel;
-pub use image::Image;
+pub use image::{Image, ImageIndex};
 pub use error::{Error, Result};
