@@ -11,8 +11,7 @@ publish = false
 
 [features]
 default = ["std"]
-alloc = []
-std = ["alloc"]
+std = []
 
 [dependencies]
 limg-core = { git = "https://github.com/limg-projects/limg-core-rs", tag = "v0.1.1" }

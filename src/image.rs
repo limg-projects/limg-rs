@@ -1,5 +1,5 @@
-#[cfg(feature = "alloc")]
 use alloc::boxed::Box;
+use alloc::vec;
 
 use crate::pixel::Pixel;
 use crate::error::Result;
