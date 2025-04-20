@@ -15,7 +15,7 @@ Limg 画像を読み書きするためのライブラリです。
 
 ```toml
 [dependencies]
-limg = { git = "https://github.com/limg-projects/limg-rs", tag = "v0.1.0" }
+limg = { git = "https://github.com/limg-projects/limg-rs", tag = "v0.1.1" }
 ```
 
 ## Examples
