@@ -14,7 +14,7 @@ const fn image_index(x: u16, y: u16, width: u16) -> usize {
     y as usize * width as usize + x as usize
 }
 
-/// Limg画像
+/// Limg画像のデータです。
 /// 
 /// Limg形式画像の初期化やピクセルデータの変更、読み取りや保存を提供します。
 /// 
