@@ -19,6 +19,7 @@ const fn image_index(x: u16, y: u16, width: u16) -> usize {
 /// Limg形式画像の初期化やピクセルデータの変更、読み取りや保存を提供します。
 /// 
 /// ピクセルデータは左上から右下への行優先でアクセスされ、`(0, 0)`は左上隅であると定義されます。
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Image {
     /// 画像の幅
     width: u16,
