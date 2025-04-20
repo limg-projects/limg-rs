@@ -3,5 +3,13 @@
 version = 4
 
 [[package]]
-name = "limg-rs"
+name = "limg"
 version = "0.1.0"
+dependencies = [
+ "limg-core",
+]
+
+[[package]]
+name = "limg-core"
+version = "0.1.1"
+source = "git+https://github.com/limg-projects/limg-core-rs?tag=v0.1.1#8495aa91a8c6f45a9ead75b2a2e1717b184d7662"

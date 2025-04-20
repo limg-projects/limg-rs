@@ -1,14 +1,13 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+#![cfg_attr(not(feature = "std"), no_std)]
+#![doc = include_str!("../README.md")]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+extern crate alloc;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+mod pixel;
+mod image;
+mod error;
+
+pub use limg_core::PixelEndian;
+pub use pixel::Pixel;
+pub use image::{Image, ImageIndex};
+pub use error::{Error, Result};
