@@ -19,6 +19,7 @@ const fn image_index(x: u16, y: u16, width: u16) -> usize {
 /// Limg形式画像の初期化やピクセルデータの変更、読み取りや保存を提供します。
 /// 
 /// ピクセルデータは左上から右下への行優先でアクセスされ、`(0, 0)`は左上隅であると定義されます。
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Image {
     /// 画像の幅
     width: u16,
@@ -472,7 +473,7 @@ impl Image {
 
         // ピクセルデータデコード
         let pixels_size = decoded_size(&spec, ColorType::Rgb565);
-        let mut pixels = Box::<[Pixel]>::new_uninit_slice(pixels_size);
+        let mut pixels = Box::<[Pixel]>::new_uninit_slice(pixels_size / ColorType::Rgb565.bytes_per_pixel());
         let pixels_slice = unsafe { from_raw_parts_mut(pixels.as_mut_ptr().cast::<u8>(), pixels_size) };
         decode_data(data_slice, pixels_slice, &spec, ColorType::Rgb565)?;
         
@@ -587,8 +588,8 @@ impl Image {
 
         // 画像のエンコード
         encode_header(buf_slice, &spec)?;
-        let buf_slice = unsafe { buf_slice.get_unchecked_mut(HEADER_SIZE..) };
-        encode_data(data_slice, buf_slice, &spec, ColorType::Rgb565)?;
+        let pixel_slice = unsafe { buf_slice.get_unchecked_mut(HEADER_SIZE..) };
+        encode_data(data_slice, pixel_slice, &spec, ColorType::Rgb565)?;
 
         // 書き込み
         writer.write_all(&buf_slice)?;
