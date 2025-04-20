@@ -2,9 +2,10 @@
 Limg 画像を読み書きするためのライブラリです。
 
 ## Features
-`#![no_std]`と互換性があります。（ただし、[`alloc`]クレートが必要になります。）
+このクレートは`#![no_std]`と互換性があります。変更するには`default-features = false`にしてください。
+その場合、[`io`]の機能が制限されます。
 
-この場合、[`io`]の機能が制限されます。
+`std`: std機能を提供します。（デフォルトでオンです。）
 
 [`alloc`]: https://doc.rust-lang.org/alloc/
 [`io`]: https://doc.rust-lang.org/std/io/index.html
